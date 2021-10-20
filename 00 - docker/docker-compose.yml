@@ -1,0 +1,18 @@
+version: '3.6'
+
+services:
+  distshiny1:
+    image: aw/distshiny
+    container_name: distshiny1
+    build: ./distshiny
+    network_mode: "host"
+    ports: 
+      - 2021:2021
+
+  distshiny2:
+    image: aw/distshiny
+    container_name: distshiny2
+    build: ./distshiny
+    network_mode: "host" 
+    ports: 
+      - 2020:2020

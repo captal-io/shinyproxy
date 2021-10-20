@@ -1,0 +1,28 @@
+version: '3.6'
+
+services:
+  shinyproxy:
+    image: aw/shinyproxy
+    container_name: shinyproxy
+    build: ./application  
+    volumes:
+      - ./application/application.yml:/opt/shinyproxy/application.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8080:8080
+    networks:
+      - mynet
+  
+  distshiny:
+    image: aw/distshiny
+    container_name: distshiny
+    build: ./apps/distshiny
+
+  bloodbanks:
+    image: aw/bloodbanks
+    container_name: bloodbanks
+    build: ./apps/bloodbanks
+
+networks:
+  mynet:
+    name: mynet

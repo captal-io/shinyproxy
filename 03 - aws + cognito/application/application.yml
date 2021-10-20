@@ -1,0 +1,42 @@
+proxy:
+  title: Shinyproxy em produção
+  landing-page: /
+  template-path: ./templates
+  heartbeat-rate: 10000
+  heartbeat-timeout: 50000
+  bind-address: 0.0.0.0
+  container-wait-time: 60000
+  port: 8080
+
+  authentication: openid # use openid auth framework
+  openid:
+    roles-claim: cognito:groups # use the groups value passed by AWS cognito to identify user groups
+    auth-url:  https://{cognito_domain_prefix}.auth.{region}.amazoncognito.com/oauth2/authorize
+    token-url:  https://{cognito_domain_prefix}.auth.{region}.amazoncognito.com/oauth2/token
+    jwks-url:  https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
+    logout-url:  https://{cognito_domain_prefix}.auth.{region}.amazoncognito.com/logout?client_id={client_id}&logout_uri={your_host_url}
+    client-id:   get this from AWS Cognito user pool management page
+    client-secret:   get this from AWS Cognito user pool management page
+
+  docker:
+    internal-networking: true
+    container-network: mynet
+  
+  specs:
+    - id: distshiny
+      display-name: Distribuições de Probabilidade
+      container-cmd: ["R", "-e", "shiny::runApp('/root/app', port = 3838, host = '0.0.0.0')"]
+      container-image: aw/distshiny
+      access-groups: [everybody, admins]
+      container-network: "${proxy.docker.container-network}"
+    - id: bloodbanks
+      display-name: Localizando bancos de sangue na Índia
+      container-cmd: ["R", "-e", "shiny::runApp('/root/app', port = 3838, host = '0.0.0.0')"]
+      container-image: aw/bloodbanks
+      container-network: "${proxy.docker.container-network}"
+      access-groups: [admins]
+ 
+server:
+  forward-headers-strategy: native
+
+
